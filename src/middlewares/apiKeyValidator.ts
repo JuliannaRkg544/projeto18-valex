@@ -7,9 +7,8 @@ export function apikeyValidator(
   next: NextFunction
 ) {
   const apiKey = req.headers["x-api-key"].toString()
-  console.log("no apikey nidd ", apiKey)
   if (!apiKey) {
-    return res.status(422).send("inexistent key");
+    return res.status(400).send("inexistent key");
   }
   const validateApiKey = apiKeySchema.validate({ apiKey });
   if (validateApiKey.error) {

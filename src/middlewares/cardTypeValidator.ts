@@ -7,9 +7,8 @@ export default function cardTypeValidator(
   next: NextFunction
 ) {
   const {cardtype} = req.body;
-  console.log("no cardtype nidd ", cardtype)
   if (!cardtype) {
-    return res.status(422).send("inexistent card type");
+    return res.status(400).send("inexistent card type");
   }
 
   const validateCardType = cardTypeSchema.validate({ cardtype });
@@ -18,7 +17,6 @@ export default function cardTypeValidator(
     return res.status(422).send("invalid card type");
   }
 
-//   res.locals = cardType;
 
   next();
 }
