@@ -3,7 +3,7 @@ import "express-async-errors"
 import cors from "cors"
 import dotenv from "dotenv"
 import router from "./routers/router.js"
-import createCardRouter from "./routers/createCardRouter.js"
+import createCardRouter from "./routers/cardRouter.js"
 import errorHandler from "./middlewares/errorHandler.js"
 
 dotenv.config()
