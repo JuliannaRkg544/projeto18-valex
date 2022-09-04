@@ -224,6 +224,9 @@ function cardDataBuilder(
 }
 
 function checkPassword(passwordToCheck: string, rightPassword: string) {
+  if(rightPassword===null){
+    throw { type: "forbidden", message: "invalid operation" };
+  }
   rightPassword = cryptr.decrypt(rightPassword);
   if (passwordToCheck !== rightPassword) {
     throw { type: "forbidden", message: "invalid password" };

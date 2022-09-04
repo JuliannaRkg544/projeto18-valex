@@ -6,7 +6,7 @@ export function apikeyValidator(
   res: Response,
   next: NextFunction
 ) {
-  const apiKey = req.headers["x-api-key"].toString()
+  const apiKey = req.headers["x-api-key"]
   if (!apiKey) {
     return res.status(400).send("inexistent key");
   }
