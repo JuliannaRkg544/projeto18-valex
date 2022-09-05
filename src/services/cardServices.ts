@@ -1,20 +1,14 @@
-import {
-  findByTypeAndEmployeeId,
-  insert,
-  TransactionTypes,
-  findByCardDetails,
-  update,
-  findByCardNumber,
-} from "../repositories/cardRepository.js";
+import * as cardRepository from "../repositories/cardRepository.js";
 import { findByApiKey } from "../repositories/companyRepository.js";
 import { faker } from "@faker-js/faker";
 import { findById } from "../repositories/employeeRepository.js";
 import Cryptr from "cryptr";
 import dayjs from "dayjs";
 
-const cryptr = new Cryptr("myTotallySecretKey");
 
+const cryptr = new Cryptr("myTotallySecretKey");
 const actualDate = dayjs().locale("pt-br").format("MM/YY");
+
 
 async function verifyApi(apiKey: string) {
   const verifyApi: [] = await findByApiKey(apiKey);
@@ -24,24 +18,23 @@ async function verifyApi(apiKey: string) {
 }
 
 async function verifyByTypeAndId(
-  cardtype: TransactionTypes,
+  cardtype: cardRepository.TransactionTypes,
   employeeid: number
 ) {
-  const verifyTypeAndId = await findByTypeAndEmployeeId(cardtype, employeeid);
+  const verifyTypeAndId = await cardRepository.findByTypeAndEmployeeId(cardtype, employeeid);
   if (verifyTypeAndId) {
     throw { type: "conflict", message: "invalid operation" };
   }
 }
 
-async function createCard(employeeid: number, cardtype: TransactionTypes) {
+async function createCard(employeeid: number, cardtype: cardRepository.TransactionTypes) {
   const cardData: any = await setCardData(employeeid, cardtype);
-  await insert(cardData);
+  await cardRepository.insert(cardData);
   return cardData;
 }
 
 async function setCardName(employeeid: number) {
   const employee = await findById(employeeid);
-  console.log(employee);
   if (!employee) {
     throw { type: "not_found", message: "invalid id" };
   }
@@ -60,9 +53,8 @@ async function setCardName(employeeid: number) {
 
 function setCvv() {
   const CVV = faker.random.numeric(3);
-
-  const cvvcryptr = cryptr.encrypt(CVV);
-  return cvvcryptr;
+  const cvcryptr = cryptr.encrypt(CVV);
+  return cvcryptr;
 }
 
 function setExpirationDate() {
@@ -72,7 +64,7 @@ function setExpirationDate() {
     .format("MM/YY");
   return expirationDate;
 }
-async function setCardData(employeeid: number, cardtype: TransactionTypes) {
+async function setCardData(employeeid: number, cardtype: cardRepository.TransactionTypes) {
   const cardNum = faker.finance.account(16).toString();
   const cardName = await setCardName(employeeid);
   const cvcNumber = setCvv().toString();
@@ -104,7 +96,7 @@ async function verifyByCardDetails(
   cvc: string,
   password: string
 ) {
-  const cardInfo = await findByCardDetails(
+  const cardInfo = await cardRepository.findByCardDetails(
     number,
     cardholderName,
     expirationDate
@@ -121,7 +113,6 @@ async function verifyByCardDetails(
     throw { type: "forbidden", message: "card already activated" };
   }
 
-  //falta pedir o cvc, descriptografar, para atualizar no banco
 
   const id = cardInfo.id;
   const cvcv = cryptr.decrypt(cardInfo.securityCode);
@@ -157,11 +148,11 @@ async function activateCard(
     cardInfo.type
   );
 
-  await update(id, cardData);
+  await cardRepository.update(id, cardData);
 }
 
 async function blockCard(cardNumber: string, password: string) {
-  const cardInfo = await findByCardNumber(cardNumber);
+  const cardInfo = await cardRepository.findByCardNumber(cardNumber);
   if (!cardInfo) {
     throw { type: "not_found", message: "card not found" };
   }
@@ -188,7 +179,7 @@ async function blockCard(cardNumber: string, password: string) {
     true,
     cardInfo.type
   );
-  await update(cardInfo.id, cardData)
+  await cardRepository.update(cardInfo.id, cardData)
   
 }
 
@@ -202,7 +193,7 @@ function cardDataBuilder(
   password: string,
   isVirtual: boolean,
   isBlocked: boolean,
-  type: TransactionTypes
+  type: cardRepository.TransactionTypes
 ) {
   const cardData = {
     id,
@@ -246,7 +237,7 @@ function checkDate(actualDate: string, expirationDate: string) {
 }
 
 async function unblockCard(cardNumber: string, password: string){
-  const cardInfo = await findByCardNumber(cardNumber);
+  const cardInfo = await cardRepository.findByCardNumber(cardNumber);
   if (!cardInfo) {
     throw { type: "not_found", message: "card not found" };
   }
@@ -276,7 +267,7 @@ async function unblockCard(cardNumber: string, password: string){
     false,
     cardInfo.type
   );
-  await update(cardInfo.id, cardData)
+  await cardRepository.update(cardInfo.id, cardData)
 }
 
 export {

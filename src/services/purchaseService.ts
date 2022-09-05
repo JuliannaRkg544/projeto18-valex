@@ -20,8 +20,6 @@ async function payShopping(
   const cardId = await verifyCardIntegraty(cardNumber, password,purchaseValue);
   await verifyBusinessIntegraty(businessId, purchaseValue, cardType);
   
-  //persistir compra
-
   const paymentData = {
     cardId,
     businessId,
@@ -30,35 +28,25 @@ async function payShopping(
 
   await paymaentRepository.insert(paymentData)
 
-  
 }
 
 async function verifyCardIntegraty(cardNumber: string, password: string,purchaseValue:number) {
   const cardInfo = await findByCardNumber(cardNumber);
-  //verifica cadastro
   if (!cardInfo) {
     throw { type: "not_found", message: "card number not found" };
   }
-  //verifica se ta ativo
   const cardPassword = cardInfo.password;
   if (cardPassword === null) {
     throw { type: "forbbiden", message: "card unactivate" };
   }
-  //verifica se esta desbloqueado
   const { isBlocked } = cardInfo;
   if (isBlocked === true) {
     throw { type: "forbbiden", message: "card blocked" };
   }
-  //verifica senha
-
 
   checkPassword(password, cardInfo.password);
-
-  //verifica data
   checkDate(actualDate, cardInfo.expirationDate);
-  //tipo do card
   cardType = cardInfo.type
-
   await compareDebitCredit(cardInfo.id,purchaseValue)
 
   return cardInfo.id
@@ -92,21 +80,14 @@ async function verifyBusinessIntegraty(
   purchaseValue: number,
   cardType: string
 ) {
-    //verifica cadastro da empresa
     const businessInfo = await findById(businessId)
     if(!businessInfo){
         throw { type: "not_found", message: "business not found" };
     }
-    //verifica tipo do cartõ e empresa
     const {type} = businessInfo
     if(type!==cardType){
         throw { type: "forbidden", message: "invalid card operator" };
     }
-    //verifica saldo:
-       // somar amount de recharges by cardId  OK
-       //somar amount de payments by cardId OK
-       //comparar
-    //inserir paymnet
 }
 
 
@@ -117,9 +98,7 @@ async function compareDebitCredit(cardId:number, purchaseValue:number){
     console.log(totalPurchasesValue, " tipo ", typeof totalPurchasesValue)
     totalPurchasesValue = purchaseValue
   }
-  //se o debito for maior que o credito n posso comprar
   if(Number(totalPurchasesValue)+Number(purchaseValue)>totalRechargesValue){
-    console.log("total de compras ",Number(totalPurchasesValue)+Number(purchaseValue),"total de recharges", totalRechargesValue)
     throw { type: "forbidden", message: "not credit on this card" };
   }
 }

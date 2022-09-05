@@ -10,16 +10,12 @@ async function rechargeCard(cardNumber: string, rechargeValue: number) {
     throw { type: "not_found", message: "card not registered" };
   }
   const { id, expirationDate, isBlocked, password } = cardInfo;
-  //somente cartões ativos, ser ativo é senha not null
   if (password === null) {
     throw { type: "forbidden", message: "card not valid" };
   }
-  //verificar se ja expirou
   checkDate(actualDate, expirationDate);
 
-  //gerar timeStamp
   const timestamp = setTimestamp();
-  //inserir card
   const rechargeData = {
     cardId: id,
     timestamp: timestamp,
