@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { TransactionTypes } from "../repositories/cardRepository.js";
 import * as cardServices from "../services/cardServices.js";
+import * as cardBalance from "../services/cardBalanceService.js"
 
 export async function createCard(req: Request, res: Response) {
   const {
@@ -21,6 +22,12 @@ export async function activateCard(req:Request, res:Response) {
   await cardServices.verifyByCardDetails(cardNumber,cardholderName,expirationDate,cvc,password)
   res.sendStatus(200)
   // await cardServices.activateCard(cardNumber,cardholderName,expirationDate,cvc,password)
+}
+
+export async function getBalance(req:Request, res:Response) {
+  const id = parseInt(req.params.id)
+    const balance = await cardBalance.getBalance(id)
+    res.status(200).send(balance)
 }
 
 export async function blockCard(req:Request, res:Response) {
