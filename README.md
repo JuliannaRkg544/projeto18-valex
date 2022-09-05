@@ -45,9 +45,9 @@
 
 - POST /card-shopping
     - Rota para registrar pagamentos pelo número do cartão    
-    - body: {
+    - body:
         "cardNumber":$"numeroDoCartão",
         "password":$"senhaDoCartão",
         "businessId":$"idDoTipoDeNegócioDoCartão",
         "purchaseValue":$"valorDaCompra"
-    }       
+         
