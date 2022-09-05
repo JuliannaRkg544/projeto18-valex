@@ -2,8 +2,6 @@ import {
   findByTypeAndEmployeeId,
   insert,
   TransactionTypes,
-  CardInsertData,
-  CardUpdateData,
   findByCardDetails,
   update,
   findByCardNumber,
